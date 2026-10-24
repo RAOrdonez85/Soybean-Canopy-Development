@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Soybean Canopy by Tillage</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: field-notebook page — control strip, four tillage plots side by side, cover curve, growth sequence table */
+:root{
+  --bg:#f1f3ec; --panel:#fafbf6; --ink:#1c2418; --muted:#5a6553; --line:#d3d9c8;
+  --sky:#e3ecee; --sky2:#f4f6ef; --accent:#8a6420; --accent-ink:#fff;
+  --c-plow:#7a4a9e; --c-chisel:#b15c19; --c-strip:#24659f; --c-nt:#2c7a4a;
+  --f-display:'Familjen Grotesk','Helvetica Neue',Arial,sans-serif;
+  --f-body:'Source Sans 3','Segoe UI',system-ui,sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141912; --panel:#1b2219; --ink:#e4eadc; --muted:#9aa690; --line:#323c2e;
+  --sky:#1f2b2e; --sky2:#192119; --accent:#d9a855; --accent-ink:#1a1408;
+  --c-plow:#b590d8; --c-chisel:#e59656; --c-strip:#6fa9e0; --c-nt:#6cc28d; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141912; --panel:#1b2219; --ink:#e4eadc; --muted:#9aa690; --line:#323c2e;
+  --sky:#1f2b2e; --sky2:#192119; --accent:#d9a855; --accent-ink:#1a1408;
+  --c-plow:#b590d8; --c-chisel:#e59656; --c-strip:#6fa9e0; --c-nt:#6cc28d; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,4.4vw,44px);line-height:1.05;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font-family:var(--f-display);font-weight:600;font-size:21px;margin:0;text-wrap:balance}
+.lede{max-width:68ch;color:var(--muted);margin:0}
+.controls{display:grid;grid-template-columns:auto 1fr;gap:10px 22px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.readout{display:flex;flex-direction:column;min-width:150px}
+.tt{font-family:var(--f-mono);font-weight:600;font-size:30px;font-variant-numeric:tabular-nums;line-height:1.1}
+.tt small{font-size:13px;color:var(--muted);font-weight:400;margin-left:4px}
+.stage{font-family:var(--f-display);font-weight:600;font-size:15px;color:var(--accent)}
+.sliderrow{display:flex;gap:12px;align-items:center;min-width:0}
+input[type=range]{flex:1;min-width:0;accent-color:var(--accent);height:28px}
+button{font:inherit;cursor:pointer}
+.play{font-family:var(--f-display);font-weight:600;background:var(--accent);color:var(--accent-ink);border:0;border-radius:6px;padding:7px 14px;min-width:78px}
+.play:focus-visible,.chip:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips span{font-size:12px;color:var(--muted);margin-right:4px}
+.chip{font-family:var(--f-mono);font-size:11.5px;font-variant-numeric:tabular-nums;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.plots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media (max-width:900px){.plots{grid-template-columns:repeat(2,minmax(0,1fr))}.controls{grid-template-columns:1fr}}
+.plot{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.plot-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:10px 12px 0}
+.plot-h h3{margin:0;font-family:var(--f-display);font-weight:700;font-size:17px;display:flex;align-items:center;gap:7px}
+.sw{width:10px;height:10px;border-radius:2px;display:inline-block}
+.cov{font-family:var(--f-mono);font-weight:600;font-size:20px;font-variant-numeric:tabular-nums}
+.cov small{font-size:11px;color:var(--muted);font-weight:400}
+canvas.side{width:100%;height:340px;display:block;background:linear-gradient(var(--sky),var(--sky2))}
+.toplbl{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:8px 12px 4px}
+canvas.top{width:calc(100% - 24px);margin:0 12px;aspect-ratio:2/1;max-width:100%;display:block;border-radius:4px}
+dl{display:grid;grid-template-columns:1fr auto;gap:3px 10px;margin:0;padding:10px 12px 12px;font-size:13px}
+dt{color:var(--muted)} dd{margin:0;font-family:var(--f-mono);font-variant-numeric:tabular-nums;text-align:right}
+@media (max-width:480px){canvas.side{height:260px} .cov{font-size:17px} .cov small{display:block;text-align:right} .controls{position:static} .chip{padding:4px 10px}}
+section{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.chartbox{overflow-x:auto}
+svg.chart{width:100%;min-width:520px;height:auto;display:block}
+svg.chart text{fill:var(--muted);font-family:var(--f-mono);font-size:11px}
+.seqwrap{overflow-x:auto}
+table.seq{border-collapse:collapse}
+table.seq th{font-weight:400;padding:4px 2px}
+table.seq thead th{font-family:var(--f-mono);font-size:11px;color:var(--muted);text-align:center;line-height:1.3;font-variant-numeric:tabular-nums}
+table.seq thead th b{display:block;color:var(--ink);font-weight:600}
+table.seq tbody th{font-family:var(--f-display);font-weight:600;font-size:13px;text-align:right;padding-right:10px;white-space:nowrap}
+table.seq td{padding:2px;text-align:center}
+table.seq canvas{width:92px;height:134px;display:block;background:linear-gradient(var(--sky),var(--sky2));border-radius:4px}
+table.seq td div{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.notes{columns:2 320px;column-gap:32px;font-size:13.5px;color:var(--muted)}
+.notes p{margin:0 0 10px;break-inside:avoid}
+.notes b{color:var(--ink);font-weight:600}
+.rights{border-top:1px solid var(--line);padding-top:14px;font-size:12.5px;color:var(--muted)}
+</style>
+</head><body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Measured canopy cover → modeled plant · 4 tillage systems</div>
+    <h1>Soybean Canopy by Tillage</h1>
+    <p class="lede">Each plant is drawn from your mean canopy cover at the selected thermal time. Cover sets the leaf area, thermal time sets the growth stage, and the drop in cover after the peak sets how many leaves yellow and fall. Drag the slider or press Play.</p>
+  </header>
+
+  <div class="controls" role="group" aria-label="Thermal time">
+    <div class="readout">
+      <div class="tt"><span id="ttv">0</span><small>°C·d</small></div>
+      <div class="stage" id="stg">Pre-emergence</div>
+    </div>
+    <div class="sliderrow">
+      <input type="range" id="tt" min="0" max="1720" step="1" value="739" aria-label="Thermal time in degree days">
+      <button class="play" id="play" type="button">Play</button>
+    </div>
+    <div class="chips" id="chips"><span>Sampling dates:</span></div>
+  </div>
+
+  <div class="plots" id="plots"></div>
+
+  <section>
+    <h2>Canopy cover over thermal time</h2>
+    <div class="card">
+      <div class="legend" id="legend"></div>
+      <div class="chartbox"><svg class="chart" id="chart" viewBox="0 0 720 300" role="img" aria-label="Canopy cover percent versus thermal time for four tillage systems"></svg></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Growth sequence</h2>
+    <div class="card seqwrap"><table class="seq" id="seq"></table></div>
+  </section>
+
+  <section>
+    <h2>How the plants are built</h2>
+    <div class="notes">
+      <p><b>Leaf area from cover.</b> Cover is converted to leaf area index with Beer's law, LAI = −ln(1 − cover) / k, with k = 0.5. Leaf area per plant is LAI × 286 cm², assuming 35 plants/m². That area is shared among the leaves present, weighted by leaf age and position.</p>
+      <p><b>Development from thermal time.</b> Emergence at 90 °C·d, a new main-stem trifoliate every 55 °C·d (capped at 16), branches from nodes 2–5. Reproductive stages are assumed: R1 540, R3 720, R5 950, R6 1150, R7 1480, R8 1640 °C·d. All four systems share this phenology; differences come from your cover data.</p>
+      <p><b>Height.</b> A logistic curve toward about 95 cm, adjusted by each system's leaf area relative to the four-system mean before canopy closure.</p>
+      <p><b>Senescence.</b> After a system's peak cover, the fraction of peak LAI still present sets how many of the oldest leaves have dropped; leaves next in line turn yellow. Fallen leaves appear on the soil.</p>
+      <p><b>Top view.</b> Each tile is 1.52 m of row by 0.76 m (one row width). Leaves are added from the row outward until the tile's green area matches the measured cover, so the tile shows your number exactly.</p>
+      <p><b>Residue.</b> Surface residue levels are illustrative (plow ~5%, chisel ~30%, strip-till ~50% with a cleared row strip, no-till ~75%), not measured values.</p>
+    </div>
+  </section>
+  <footer class="rights">© 2026. All rights reserved. This interactive model and its figures are provided for students enrolled in the course. Do not copy, modify, or redistribute without the author's written permission.</footer>
+</div>
+
+<script>
+const TTS=[0,141.9,211.3,338.4,408.2,493.8,621.5,739.5,840.55,903,988.58,1166,1232,1391,1479,1584,1620,1720];
+const TRTS=[
+ {name:'Plow',  cvar:'--c-plow',  residue:.05, strip:false, cov:[0,4.19625,11.285,25.01625,28.60875,47.9475,56.505,73.65625,88.85125,90.1885714,96.8225,95.84,94.6525,94.0475,89.22,62.32,21.26,0.36125]},
+ {name:'Chisel',cvar:'--c-chisel',residue:.30, strip:false, cov:[0,2.78625,11.18625,18.48,20.485,41.19625,51.84375,68.705,87.85375,89.49875,95.38875,96.01,94.71625,93.32375,87.4675,65.38375,23.18625,3.42625]},
+ {name:'Strip-Till',cvar:'--c-strip',residue:.50,strip:true, cov:[0,2.84375,9.87875,18.87625,22.625,41.86875,54.62875,71.69375,88.61125,89.445,96.25375,95.55375,95.675,94.82375,92.40625,73.57625,40.03625,1.13625]},
+ {name:'No-Till',cvar:'--c-nt',   residue:.75, strip:false, cov:[0,1.735,5.9925,12.28625,14.96,28.77625,45.1925,63.16125,85.275,88.3975,95.52,95.60125,94.8575,94.53625,94.52625,89.345,70.81,3.42625]}
+];
+const TMAX=1720, K=0.5, AREA_PLANT=1e4/35;
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+function hh(a,b,c){let x=(Math.imul(a|0,374761393)+Math.imul(b|0,668265263)+Math.imul(c|0,1274126177))|0;x=Math.imul(x^(x>>>13),1274126177);x^=x>>>16;x=Math.imul(x^(x>>>15),2246822519);x^=x>>>13;return (x>>>0)/4294967296;}
+function coverAt(tr,t){const c=tr.cov;if(t<=0)return 0;if(t>=TMAX)return c[c.length-1]/100;let i=1;while(TTS[i]<t)i++;const f=(t-TTS[i-1])/(TTS[i]-TTS[i-1]);return (c[i-1]+f*(c[i]-c[i-1]))/100;}
+const laiOf=c=>c<=0?0:-Math.log(1-Math.min(c,.985))/K;
+TRTS.forEach(tr=>{let mi=0;tr.cov.forEach((v,i)=>{if(v>tr.cov[mi])mi=i});tr.tPeak=TTS[mi];tr.laiPeak=laiOf(tr.cov[mi]/100);
+  const cross=p=>{for(let i=1;i<TTS.length;i++){if(tr.cov[i]>=p){const a=tr.cov[i-1],b=tr.cov[i];return TTS[i-1]+(p-a)/(b-a)*(TTS[i]-TTS[i-1]);}}return null};
+  tr.t50=cross(50);tr.t90=cross(90);});
+function heightFactor(tr,t){const tt=clamp(t,200,990);const m=TRTS.reduce((s,x)=>s+laiOf(coverAt(x,tt)),0)/4;return Math.pow(clamp(laiOf(coverAt(tr,tt))/m,.6,1.5),.25);}
+const nTri=t=>t<140?0:Math.min(16,Math.floor((t-140)/55)+1);
+function stageOf(t){if(t<90)return'Pre-emergence';if(t<140)return'VE';const v=nTri(t)-1;const vs=v<1?'VC':'V'+v;
+  const R=[[1640,'R8'],[1480,'R7'],[1150,'R6'],[950,'R5'],[820,'R4'],[720,'R3'],[620,'R2'],[540,'R1']];
+  for(const [x,l] of R)if(t>=x)return t>=950?l:vs+' · '+l;return vs;}
+
+function buildPlant(ti,t){
+  const tr=TRTS[ti];const hf=heightFactor(tr,t);
+  const H=t<90?0:(4+91/(1+Math.exp(-(Math.min(t,1250)-650)/130)))*hf;
+  const n=nTri(t);const L=[];
+  if(t>=120){L.push({id:1,uni:true,node:0,side:-1,init:120,sf:.45,nl:1});L.push({id:2,uni:true,node:0,side:1,init:120,sf:.45,nl:1});}
+  for(let i=1;i<=n;i++)L.push({id:10+i,node:i,side:i%2?1:-1,init:140+(i-1)*55,sf:.7+.4*Math.sin(Math.PI*i/17),nl:3});
+  const branches=[];
+  for(const b of [2,3,4,5]){const t0=140+(b+3)*55;if(t>t0+10){const side=b%2?-1:1;const m=Math.min(4,Math.floor((Math.min(t,1050)-t0)/70)+1);
+    const len=Math.min(26,(Math.min(t,1100)-t0)/11)*hf*(.8+.3*hh(ti,b,3));branches.push({b,side,len,m,t0,ang:(24+12*hh(ti,b,4))*Math.PI/180});
+    for(let j=1;j<=m;j++)L.push({id:100+b*10+j,branch:b,j,side:j%2?side:-side,init:t0+(j-1)*70,sf:.62,nl:3});}}
+  const tE=Math.min(t,1100),tA=Math.min(t,tr.tPeak);
+  const A=laiOf(coverAt(tr,tA))*AREA_PLANT;let sw=0;
+  L.forEach(l=>{l.w=l.sf*clamp((tE-l.init)/170,.05,1);sw+=l.w;});
+  L.forEach(l=>{const la=sw?A*l.w/sw/l.nl:0;l.len=Math.sqrt(la/.39);l.age=t-l.init;});
+  // senescence
+  const post=t>tr.tPeak;const g=post?clamp(laiOf(coverAt(tr,t))/tr.laiPeak,0,1):1;const loss=1-g;
+  const gY=clamp((t-1450)/200,0,1)*.85+clamp((t-1640)/80,0,1)*.5;
+  const ord=[...L].sort((a,b)=>a.init-b.init||a.id-b.id);let cum=0;
+  ord.forEach(l=>{const p=(cum+l.w/2)/sw;cum+=l.w;l.drop=post&&p<loss;l.yel=Math.max(gY,post&&loss>.005?clamp(1-(p-loss)/.28,0,1):0);});
+  return {H,n,L,branches,hf,t,ti,dropped:L.filter(l=>l.drop).length};
+}
+
+function lerpHSL(a,b,f){return [a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f,a[2]+(b[2]-a[2])*f]}
+const hsl=c=>`hsl(${c[0].toFixed(1)},${c[1].toFixed(1)}%,${c[2].toFixed(1)}%)`;
+function leafCol(yel,dl){const G=[108,44,31+dl],Y=[50,70,52+dl*.5],B=[32,42,38];return yel<=1?lerpHSL(G,Y,yel):lerpHSL(Y,B,clamp(yel-1,0,1));}
+function leaflet(ctx,x,y,a,len,wid,fill,vein){if(len<.4)return;ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.beginPath();ctx.moveTo(0,0);
+  ctx.bezierCurveTo(len*.18,-wid*.64,len*.72,-wid*.56,len,0);ctx.bezierCurveTo(len*.72,wid*.56,len*.18,wid*.64,0,0);ctx.fillStyle=fill;ctx.fill();
+  if(vein&&len>6){ctx.strokeStyle=vein;ctx.lineWidth=Math.max(.5,len*.025);ctx.beginPath();ctx.moveTo(len*.04,0);ctx.lineTo(len*.9,0);ctx.stroke();}ctx.restore();}
+function podShape(ctx,x,y,a,len,wid,col,edge){ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(0,-wid/2,len,wid,wid/2);else ctx.ellipse(len/2,0,len/2,wid/2,0,0,7);ctx.fillStyle=col;ctx.fill();
+  if(len>5){ctx.strokeStyle=edge;ctx.lineWidth=.6;ctx.stroke();ctx.beginPath();for(let k=1;k<3;k++){ctx.moveTo(len*k/3,-wid*.45);ctx.lineTo(len*k/3,wid*.45);}ctx.globalAlpha=.35;ctx.stroke();}ctx.restore();}
+
+function drawGround(ctx,w,h,gy,tr,ti,small,P,s){
+  ctx.fillStyle='#6b4f36';ctx.fillRect(0,gy,w,h-gy);ctx.fillStyle='#57402c';ctx.fillRect(0,gy+3,w,h-gy-3);
+  const cx=w/2,n=Math.round(tr.residue*(small?40:90));ctx.lineCap='round';
+  for(let i=0;i<n;i++){const x=hh(ti,i,11)*w;if(tr.strip&&Math.abs(x-cx)<w*.13)continue;const y=gy-1+hh(ti,i,12)*5;const l=(small?5:9)+hh(ti,i,13)*(small?6:14);const a=(hh(ti,i,14)-.5)*.5;
+    ctx.strokeStyle=`hsl(42,${35+hh(ti,i,15)*20}%,${58+hh(ti,i,16)*18}%)`;ctx.lineWidth=small?1.2:1.8;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);ctx.stroke();}
+  if(P&&P.dropped){const m=Math.min(P.dropped*2,40);for(let i=0;i<m;i++){const x=cx+(hh(ti,i,21)-.5)*Math.min(w*.8,70*s*2);const c=leafCol(1+hh(ti,i,22)*.8,0);
+    ctx.save();ctx.translate(x,gy+hh(ti,i,23)*3);ctx.scale(1,.35);ctx.beginPath();ctx.ellipse(0,0,3.2*s*(.7+hh(ti,i,24)*.5),2*s,hh(ti,i,25)*3,0,7);ctx.fillStyle=hsl(c);ctx.fill();ctx.restore();}}
+}
+
+function drawPlant(ctx,w,h,ti,t,small){
+  const tr=TRTS[ti];ctx.clearRect(0,0,w,h);
+  const gy=h-(small?14:26);const s=Math.min((gy-10)/106,w/(small?62:74));const cx=w/2;
+  const P=t>=90?buildPlant(ti,t):null;
+  drawGround(ctx,w,h,gy,tr,ti,small,P,s);
+  if(!P){ctx.fillStyle='#e8d9a6';ctx.beginPath();ctx.ellipse(cx,gy+8,3*Math.max(1,s*.5),2.2*Math.max(1,s*.5),0,0,7);ctx.fill();
+    if(t>40){ctx.strokeStyle='#efe6c4';ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(cx,gy+7);ctx.quadraticCurveTo(cx+3,gy+3,cx+1,gy+1+ (90-t)/20);ctx.stroke();}return;}
+  const {H,n,L,branches}=P;const late=clamp((t-1450)/200,0,1);
+  const stemCol=hsl(lerpHSL([95,38,36],[36,40,50],late));const bend=(hh(ti,7,7)-.5)*2.4;
+  const y0=n===0?H:Math.min(8,H*1.3/(n+1.3));
+  const nodeH=k=>k===0?y0:(n?y0+(H-y0)*k/n:H);
+  const sx=y=>cx+Math.sin(y/Math.max(H,1)*Math.PI)*bend*s;
+  const pt=k=>{const y=nodeH(k);return [sx(y),gy-y*s];};
+  const swid=Math.max(1,s*(.18+.42*H/100));
+  // stem
+  ctx.strokeStyle=stemCol;ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=swid;ctx.beginPath();ctx.moveTo(cx,gy+2);
+  for(let y=0;y<=H;y+=Math.max(1,H/30))ctx.lineTo(sx(y),gy-y*s);ctx.lineTo(sx(H),gy-H*s);ctx.stroke();
+  // branches
+  const bInfo={};branches.forEach(br=>{const [bx,by]=pt(br.b);const ex=bx+Math.sin(br.ang)*br.side*br.len*s,ey=by-Math.cos(br.ang)*br.len*s;
+    bInfo[br.b]={bx,by,ex,ey,br};ctx.lineWidth=swid*.65;ctx.beginPath();ctx.moveTo(bx,by);ctx.quadraticCurveTo(bx+(ex-bx)*.2,by+(ey-by)*.6,ex,ey);ctx.stroke();});
+  const bPt=(b,j)=>{const B=bInfo[b];const f=j/(B.br.m+.35);return [B.bx+(B.ex-B.bx)*f,B.by+(B.ey-B.by)*f];};
+  // pods
+  const pr=clamp((t-720)/230,0,1);
+  if(pr>0){const pl=(1.4+3*clamp((t-720)/300,0,1))*s,pw=Math.max(1.5,.85*s);
+    const g=[100,38,46],tan=[38,48,64],br=[30,38,40];const pc=t<1480?g:(t<1640?lerpHSL(g,tan,(t-1480)/160):lerpHSL(tan,br,clamp((t-1640)/80,0,1)));
+    const col=hsl(pc),edge=hsl([pc[0],pc[1],pc[2]-14]);
+    const sites=[];for(let k=2;k<n-1;k++)sites.push([pt(k),k]);Object.values(bInfo).forEach(B=>{for(let j=1;j<=B.br.m;j++)sites.push([bPt(B.br.b,j),50+B.br.b*10+j]);});
+    sites.forEach(([[x,y],k])=>{const c=Math.floor(pr*(1+3.2*hh(ti,k,31)));for(let q=0;q<c;q++){const sd=(hh(ti,k,40+q)<.5?-1:1);const a=Math.PI/2+sd*(.5+hh(ti,k,50+q)*.7);
+      podShape(ctx,x+sd*swid*.6,y+q*pw*.6,a,pl*(.8+.3*hh(ti,k,60+q)),pw,col,edge);}});}
+  // flowers
+  if(t>540&&t<900){const fa=Math.min(clamp((t-540)/60,0,1),clamp((900-t)/80,0,1));ctx.globalAlpha=fa;
+    for(let k=2;k<n;k++){if(t-(140+(k-1)*55)<120)continue;const [x,y]=pt(k);for(let q=0;q<2;q++){const sd=q?1:-1;ctx.fillStyle=q?'#b98fd6':'#9b6bc4';
+      ctx.beginPath();ctx.arc(x+sd*(swid+.8*s),y+q*.6*s,Math.max(1.3,.45*s),0,7);ctx.fill();}}ctx.globalAlpha=1;}
+  // cotyledons
+  if(t<430){const ye=clamp((t-300)/120,0,1);const c=hsl(lerpHSL([82,45,48],[52,65,58],ye));const [x,y]=[sx(y0*.55),gy-y0*.55*s];
+    for(const sd of [-1,1]){ctx.save();ctx.translate(x+sd*1.1*s,y);ctx.rotate(sd*(.25+ye*.9));ctx.beginPath();ctx.ellipse(0,0,1.5*s,.9*s,0,0,7);ctx.fillStyle=c;ctx.fill();ctx.restore();}}
+  // leaves: older first
+  const vis=L.filter(l=>!l.drop).sort((a,b)=>a.init-b.init);
+  vis.forEach(l=>{const [x,y]=l.branch?bPt(l.branch,l.j):pt(l.node);const len=l.len*s;if(len<.5)return;
+    const fs=.5+.5*hh(ti,l.id,1);const an=clamp(l.age/380,0,1);const sag=l.yel*.7;
+    const th=((l.uni?55:24)+42*an+(hh(ti,l.id,2)-.5)*20)*Math.PI/180+sag;
+    const pl=l.uni?.25*l.len*s:Math.min(16,.6+1.45*l.len)*s*(l.branch?.8:1)*clamp(l.age/120,.25,1);
+    const dx=Math.sin(th)*l.side*(.55+.45*fs),dy=-Math.cos(th);const ex=x+dx*pl,ey=y+dy*pl;
+    const dl=(fs-.75)*10+(l.age<110?6:0);const col=hsl(leafCol(l.yel,dl)),vein=hsl(leafCol(l.yel,dl-9));
+    ctx.strokeStyle=hsl(leafCol(l.yel*.8,-4));ctx.lineWidth=Math.max(.7,swid*.35);ctx.beginPath();ctx.moveTo(x,y);ctx.quadraticCurveTo(x+dx*pl*.5,y+dy*pl*.5-pl*.08,ex,ey);ctx.stroke();
+    const base=Math.atan2(dy,dx)+l.side*(.35+sag);const wid=len*.6*(.55+.45*fs);
+    if(l.nl===3){const lat=len*.88;const sp=1.05;leaflet(ctx,ex,ey,base-sp,lat,wid*.92,col,vein);leaflet(ctx,ex,ey,base+sp,lat,wid*.92,col,vein);
+      leaflet(ctx,ex+Math.cos(base)*len*.08,ey+Math.sin(base)*len*.08,base,len,wid,col,vein);}
+    else leaflet(ctx,ex,ey,base,len,wid*1.05,col,vein);});
+}
+
+// top view
+const TV={W:160,H:80,N:3600};
+TRTS.forEach((tr,ti)=>{const E=[];const grid=new Uint8Array(TV.W*TV.H);let cnt=0;const cum=new Float32Array(TV.N);
+  for(let k=0;k<TV.N;k++){const u1=Math.max(1e-6,hh(ti,k,101)),u2=hh(ti,k,102);const gs=Math.sqrt(-2*Math.log(u1))*Math.cos(2*Math.PI*u2);
+    const sd=.012+.33*Math.pow(k/TV.N,.75);let y=.38+gs*sd/0.76*0.76;// meters across
+    const e={x:hh(ti,k,103)*1.52,y:((y%.76)+.76)%.76,rx:.028+.024*hh(ti,k,104),ry:.016+.012*hh(ti,k,105),a:hh(ti,k,106)*Math.PI,l:hh(ti,k,107)};
+    E.push(e);const sc=TV.W/1.52;const R=Math.ceil(e.rx*sc)+1;const cx=e.x*sc,cy=e.y*sc,ca=Math.cos(e.a),sa=Math.sin(e.a);
+    for(let i=-R;i<=R;i++)for(let j=-R;j<=R;j++){const px=Math.floor(cx)+i,py=Math.floor(cy)+j;const dx=px+.5-cx,dy=py+.5-cy;const u=(dx*ca+dy*sa)/(e.rx*sc),v=(-dx*sa+dy*ca)/(e.ry*sc);
+      if(u*u+v*v<=1){const gx=((px%TV.W)+TV.W)%TV.W,gy=((py%TV.H)+TV.H)%TV.H;const id=gy*TV.W+gx;if(!grid[id]){grid[id]=1;cnt++;}}}
+    cum[k]=cnt/(TV.W*TV.H);}
+  tr.E=E;tr.cum=cum;tr.topKey='';});
+function drawTop(c,ti,t){const tr=TRTS[ti];const cv=coverAt(tr,t);let lo=0,hi=TV.N;while(lo<hi){const m=(lo+hi)>>1;if(tr.cum[m]<cv)lo=m+1;else hi=m;}const k=cv<=0?0:Math.min(TV.N,lo+1);
+  const post=t>tr.tPeak;const loss=post?1-clamp(laiOf(cv)/tr.laiPeak,0,1):0;const gY=clamp((t-1450)/200,0,1)*.85;
+  const key=k+'|'+loss.toFixed(2)+'|'+gY.toFixed(2)+'|'+c.width;if(c._key===key)return;c._key=key;
+  const ctx=c.getContext('2d');const w=c.width,h=c.height;const sc=w/1.52;ctx.setTransform(1,0,0,1,0,0);
+  ctx.fillStyle='#5e4430';ctx.fillRect(0,0,w,h);
+  const nr=Math.round(tr.residue*520);ctx.lineCap='round';for(let i=0;i<nr;i++){const y=hh(ti,i,201)*h;if(tr.strip&&Math.abs(y-h/2)<h*.17)continue;const x=hh(ti,i,202)*w,l=(6+hh(ti,i,203)*16)*w/400,a=hh(ti,i,204)*Math.PI;
+    ctx.strokeStyle=`hsl(42,${35+hh(ti,i,205)*20}%,${58+hh(ti,i,206)*18}%)`;ctx.lineWidth=2*w/400;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l);ctx.stroke();}
+  for(let q=0;q<k;q++){const e=tr.E[q];const yl=Math.max(gY,clamp(loss*1.6-e.l*.6,0,1.2));ctx.fillStyle=hsl(leafCol(yl,(e.l-.5)*12));
+    for(const ox of [0,-w,w])for(const oy of [0,-h,h]){const x=e.x*sc+ox,y=e.y*sc+oy;if(x<-30||x>w+30||y<-30||y>h+30)continue;ctx.beginPath();ctx.ellipse(x,y,e.rx*sc,e.ry*sc,e.a,0,7);ctx.fill();}}
+  ctx.strokeStyle='rgba(255,255,255,.35)';ctx.setLineDash([4,5]);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();ctx.setLineDash([]);}
+
+// DOM
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const plotsEl=document.getElementById('plots');
+TRTS.forEach((tr,ti)=>{const d=document.createElement('article');d.className='plot';d.innerHTML=`
+  <div class="plot-h"><h3><span class="sw" style="background:var(${tr.cvar})"></span>${tr.name}</h3><div class="cov"><span data-k="cov">0</span><small>% cover</small></div></div>
+  <canvas class="side" aria-label="Side view of a modeled ${tr.name} soybean plant"></canvas>
+  <div class="toplbl">Top view · 1.52 m of row</div>
+  <canvas class="top" aria-label="Top view of ${tr.name} canopy cover"></canvas>
+  <dl><dt>Leaf area index (est.)</dt><dd data-k="lai"></dd><dt>Plant height (est.)</dt><dd data-k="h"></dd><dt>Leaves dropped</dt><dd data-k="drop"></dd>
+  <dt>50% cover reached</dt><dd>${tr.t50?Math.round(tr.t50)+' °C·d':'—'}</dd><dt>Canopy closure (90%)</dt><dd>${tr.t90?Math.round(tr.t90)+' °C·d':'—'}</dd></dl>`;
+  plotsEl.appendChild(d);tr.el=d;tr.side=d.querySelector('canvas.side');tr.top=d.querySelector('canvas.top');});
+const legend=document.getElementById('legend');TRTS.forEach(tr=>{legend.insertAdjacentHTML('beforeend',`<span><span class="sw" style="background:var(${tr.cvar})"></span>${tr.name}</span>`)});
+
+function fit(c){const r=c.getBoundingClientRect(),d=window.devicePixelRatio||1;const W=Math.max(1,Math.round(r.width*d)),Hh=Math.max(1,Math.round(r.height*d));
+  if(c.width!==W||c.height!==Hh){c.width=W;c.height=Hh;c._key='';}const ctx=c.getContext('2d');ctx.setTransform(d,0,0,d,0,0);return {ctx,w:r.width,h:r.height};}
+
+// chart
+const svg=document.getElementById('chart');const M={l:46,r:14,t:14,b:38},CW=720,CH=300;
+const X=t=>M.l+t/1800*(CW-M.l-M.r),Y=c=>CH-M.b-c/100*(CH-M.t-M.b);
+function buildChart(){let s='';const grid=css('--line'),mut=css('--muted');
+  for(let c=0;c<=100;c+=25)s+=`<line x1="${M.l}" x2="${CW-M.r}" y1="${Y(c)}" y2="${Y(c)}" stroke="${grid}" stroke-width="1"/><text x="${M.l-8}" y="${Y(c)+4}" text-anchor="end">${c}</text>`;
+  for(let t=0;t<=1800;t+=200)s+=`<text x="${X(t)}" y="${CH-M.b+16}" text-anchor="middle">${t}</text>`;
+  s+=`<text x="${(M.l+CW-M.r)/2}" y="${CH-4}" text-anchor="middle">Thermal time (°C·d)</text><text x="12" y="${(M.t+CH-M.b)/2}" text-anchor="middle" transform="rotate(-90 12 ${(M.t+CH-M.b)/2})">Canopy cover (%)</text>`;
+  s+=`<line x1="${M.l}" x2="${CW-M.r}" y1="${Y(90)}" y2="${Y(90)}" stroke="${mut}" stroke-dasharray="3 4" stroke-width="1"/><text x="${M.l+6}" y="${Y(90)-5}" text-anchor="start">90% closure</text>`;
+  TRTS.forEach(tr=>{const c=css(tr.cvar);s+=`<polyline fill="none" stroke="${c}" stroke-width="2.2" stroke-linejoin="round" points="${tr.cov.map((v,i)=>X(TTS[i])+','+Y(v)).join(' ')}"/>`;
+    tr.cov.forEach((v,i)=>s+=`<circle cx="${X(TTS[i])}" cy="${Y(v)}" r="2.6" fill="${c}"/>`);});
+  s+=`<line id="cur" y1="${M.t}" y2="${CH-M.b}" stroke="${css('--ink')}" stroke-width="1.2"/>`;svg.innerHTML=s;}
+
+// sequence
+const SEQ=[211.3,338.4,493.8,621.5,739.5,840.55,988.58,1479,1584,1620];
+function buildSeq(){const tb=document.getElementById('seq');let h='<thead><tr><th></th>'+SEQ.map(t=>`<th><b>${Math.round(t)}</b>${stageOf(t)}</th>`).join('')+'</tr></thead><tbody>';
+  TRTS.forEach((tr,ti)=>{h+=`<tr><th scope="row">${tr.name}</th>`+SEQ.map((t,j)=>`<td><canvas data-ti="${ti}" data-t="${t}"></canvas><div>${tr.cov[TTS.indexOf(t)].toFixed(1)}%</div></td>`).join('')+'</tr>';});
+  tb.innerHTML=h+'</tbody>';}
+function drawSeq(){document.querySelectorAll('#seq canvas').forEach(c=>{const {ctx,w,h}=fit(c);drawPlant(ctx,w,h,+c.dataset.ti,+c.dataset.t,true);});}
+
+// controls
+const slider=document.getElementById('tt'),ttv=document.getElementById('ttv'),stg=document.getElementById('stg'),chips=document.getElementById('chips');
+TTS.slice(1).forEach(t=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=Math.round(t);b.dataset.t=t;b.setAttribute('aria-pressed','false');b.onclick=()=>{stop();setT(t);};chips.appendChild(b);});
+let T=+slider.value;
+function render(){ttv.textContent=Math.round(T);stg.textContent=stageOf(T);
+  chips.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',Math.abs(+b.dataset.t-T)<.6?'true':'false'));
+  TRTS.forEach((tr,ti)=>{const {ctx,w,h}=fit(tr.side);drawPlant(ctx,w,h,ti,T,false);const r=tr.top.getBoundingClientRect(),d=window.devicePixelRatio||1;
+    const W=Math.round(r.width*d),Hh=Math.round(r.height*d);if(tr.top.width!==W||tr.top.height!==Hh){tr.top.width=W;tr.top.height=Hh;}drawTop(tr.top,ti,T);
+    const c=coverAt(tr,T),P=T>=90?buildPlant(ti,T):null;tr.el.querySelector('[data-k=cov]').textContent=(c*100).toFixed(1);
+    tr.el.querySelector('[data-k=lai]').textContent=laiOf(c).toFixed(2);tr.el.querySelector('[data-k=h]').textContent=P?Math.round(P.H)+' cm':'—';
+    tr.el.querySelector('[data-k=drop]').textContent=P?P.dropped+' of '+P.L.length:'—';});
+  const cur=document.getElementById('cur');if(cur){cur.setAttribute('x1',X(T));cur.setAttribute('x2',X(T));}}
+let raf=0,need=false;function req(){if(!need){need=true;raf=requestAnimationFrame(()=>{need=false;render();});}}
+function setT(t){T=clamp(t,0,TMAX);slider.value=T;req();}
+slider.addEventListener('input',()=>{stop();T=+slider.value;req();});
+const playBtn=document.getElementById('play');let playing=false,last=0;
+function step(ts){if(!playing)return;if(last){T+=(ts-last)/1000*TMAX/14;if(T>=TMAX){T=TMAX;stop();}}last=ts;slider.value=T;render();if(playing)requestAnimationFrame(step);}
+function stop(){playing=false;playBtn.textContent='Play';}
+playBtn.onclick=()=>{if(playing){stop();return;}if(T>=TMAX-1)T=0;playing=true;last=0;playBtn.textContent='Pause';requestAnimationFrame(step);};
+function all(){buildChart();render();drawSeq();}
+buildSeq();
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{render();drawSeq();},120);});
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{buildChart();render();});
+new MutationObserver(()=>{buildChart();render();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{render();});
+all();
+</script>
+
+</body></html>
